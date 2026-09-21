@@ -14,14 +14,60 @@ import dukeImage from "@/assets/duke-guide.png";
 import createdImage from "@/assets/spritemal-created.png";
 
 export const Route = createFileRoute("/")({
-  head: () => ({ meta: [
-    { title: "SPRITEMALS — Create Your AI Pet Companion" },
-    { name: "description", content: "Turn your real pet into a magical Spritemal, virtual AI companion, and custom collectible." },
-    { property: "og:title", content: "SPRITEMALS — Your Pet, Reimagined" },
-    { property: "og:description", content: "Create a magical AI pet companion and bring it home as a custom plush." },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary_large_image" },
-  ]}),
+  head: () => ({
+    meta: [
+      { title: "SPRITEMALS | Create Your AI Pet Companion" },
+      {
+        name: "description",
+        content:
+          "Turn your real pet into a personalized Spritemal—a magical virtual AI companion, digital plushie, and custom collectible concept.",
+      },
+      { name: "robots", content: "index, follow, max-image-preview:large" },
+      { property: "og:title", content: "SPRITEMALS | Your Pet, Reimagined" },
+      {
+        property: "og:description",
+        content:
+          "Create a personalized virtual pet companion, customize its look, and explore a custom plush inspired by the pet you love.",
+      },
+      { property: "og:url", content: "https://spritemals-mock-1.lovable.app/" },
+      { property: "og:site_name", content: "SPRITEMALS" },
+      { property: "og:locale", content: "en_US" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "SPRITEMALS | Your Pet, Reimagined" },
+      {
+        name: "twitter:description",
+        content:
+          "Turn your real pet into a magical virtual companion and custom collectible concept.",
+      },
+    ],
+    links: [{ rel: "canonical", href: "https://spritemals-mock-1.lovable.app/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: "SPRITEMALS",
+          url: "https://spritemals-mock-1.lovable.app/",
+          description:
+            "A mobile-first creative prototype that turns a real pet into a personalized virtual companion and custom collectible concept.",
+          applicationCategory: "EntertainmentApplication",
+          operatingSystem: "Web",
+          creator: {
+            "@type": "Organization",
+            name: "Goku24",
+          },
+          offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "USD",
+            description: "Free interactive prototype; no live checkout or manufacturing.",
+          },
+        }),
+      },
+    ],
+  }),
   component: SpritemalsApp,
 });
 
