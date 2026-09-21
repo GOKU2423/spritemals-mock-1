@@ -8,8 +8,15 @@ export const Route = createFileRoute("/api/generate-spritemal")({
     handlers: {
       POST: async ({ request }) => {
         const apiKey = process.env.OPENAI_API_KEY;
+        const demoCode = process.env.SPRITEMALS_DEMO_CODE;
         if (!apiKey) {
           return Response.json({ error: "AI generation is not configured yet." }, { status: 503 });
+        }
+        if (!demoCode || request.headers.get("x-spritemals-demo-code") !== demoCode) {
+          return Response.json(
+            { error: "Enter the private demo code to open the creation portal." },
+            { status: 401 },
+          );
         }
 
         const incoming = await request.formData();
