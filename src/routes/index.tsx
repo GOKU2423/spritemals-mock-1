@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { CreateStudio, type SavedSpritemal } from "@/components/spritemals/CreateStudio";
 import jadeImage from "@/assets/jade-guide.png";
 import kingImage from "@/assets/king-guide.png";
 import dukeImage from "@/assets/duke-guide.png";
@@ -52,6 +53,7 @@ function SpritemalsApp() {
   const [generating, setGenerating] = useState(false);
   const [uploaded, setUploaded] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [savedProfile, setSavedProfile] = useState<SavedSpritemal | null>(null);
   const [name, setName] = useState("Nova");
   const [toast, setToast] = useState("");
   const [mood, setMood] = useState("Curious");
@@ -61,6 +63,19 @@ function SpritemalsApp() {
   if (!currentGuide) return null;
 
   useEffect(() => { if (!toast) return; const timer = window.setTimeout(() => setToast(""), 2200); return () => window.clearTimeout(timer); }, [toast]);
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem("spritemals.saved-companion");
+      if (!stored) return;
+      const profile = JSON.parse(stored) as SavedSpritemal;
+      if (!profile.name || !profile.custom) return;
+      setSavedProfile(profile);
+      setSaved(true);
+      setName(profile.name);
+    } catch {
+      window.localStorage.removeItem("spritemals.saved-companion");
+    }
+  }, []);
 
   const go = (next: View) => { setView(next); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const beginCreate = () => { setView("create"); window.setTimeout(() => createRef.current?.scrollIntoView({ behavior: "smooth" }), 50); };
@@ -79,8 +94,8 @@ function SpritemalsApp() {
       </header>
 
       {view === "home" && <HomeView guide={guide} setGuide={setGuide} beginCreate={beginCreate} currentGuide={currentGuide} />}
-      {view === "create" && <CreateView ref={createRef} step={step} setStep={setStep} uploaded={uploaded} setUploaded={setUploaded} generated={generated} generating={generating} generate={generate} name={name} setName={setName} custom={custom} setCustom={setCustom} save={() => { setSaved(true); setStep(4); setToast(`${name} saved to My Spritemals`); }} go={go} />}
-      {view === "collection" && <CollectionView saved={saved} name={name} beginCreate={beginCreate} go={go} />}
+      {view === "create" && <div ref={createRef}><CreateStudio initial={savedProfile} go={go} onSave={(profile) => { setSavedProfile(profile); setSaved(true); setName(profile.name); window.localStorage.setItem("spritemals.saved-companion", JSON.stringify(profile)); setToast(`${profile.name} adopted and saved`); }} /></div>}
+      {view === "collection" && <CollectionView saved={saved} name={name} profile={savedProfile} beginCreate={beginCreate} go={go} />}
       {view === "shop" && <ShopView name={saved ? name : "Your Spritemal"} notify={setToast} />}
       {view === "companion" && <CompanionView name={saved ? name : "Nova"} mood={mood} setMood={setMood} />}
 
@@ -132,7 +147,7 @@ function CreateView({ ref: createRef, step, setStep, uploaded, setUploaded, gene
 
 function CreatureStage({ name }: { name: string }) { return <div className="relative min-h-96 overflow-hidden rounded-lg border border-primary/30 bg-cosmic"><div className="animate-portal absolute bottom-[10%] left-[10%] right-[10%] h-12 rounded-[50%] border-2 border-primary bg-primary/20 shadow-portal-lg"/><img src={createdImage} alt={`${name} custom Spritemal`} loading="lazy" width={1024} height={1280} className="animate-floaty relative z-10 h-96 w-full object-contain"/><div className="absolute bottom-4 left-4 z-20 rounded-md bg-background/80 px-3 py-2 backdrop-blur"><strong className="font-display text-lg">{name || "Unnamed"}</strong><span className="ml-2 text-xs text-primary">LV. 01</span></div></div>; }
 
-function CollectionView({ saved, name, beginCreate, go }: { saved: boolean; name: string; beginCreate: () => void; go: (v: View) => void }) { return <div className="mx-auto min-h-[calc(100vh-4rem)] max-w-6xl px-4 py-10 sm:px-6"><p className="text-xs font-bold uppercase text-primary">Your collection</p><h1 className="mt-2 font-display text-4xl font-bold">MY SPRITEMALS</h1>{saved ? <div className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]"><div className="glass-panel overflow-hidden rounded-lg"><CreatureStage name={name}/><div className="grid grid-cols-3 border-t border-border p-4 text-center"><div><strong>01</strong><p className="text-[10px] uppercase text-muted-foreground">Level</p></div><div><strong>New</strong><p className="text-[10px] uppercase text-muted-foreground">Bond</p></div><div><strong>Starlight</strong><p className="text-[10px] uppercase text-muted-foreground">Type</p></div></div></div><div className="space-y-3"><Button variant="portal" size="xl" className="w-full" onClick={() => go("companion")}><Heart/>Visit {name}</Button><Button variant="glass" size="xl" className="w-full" onClick={() => go("shop")}><ShoppingBag/>Shop Their Collection</Button><Button variant="glass" size="xl" className="w-full" onClick={beginCreate}><Sparkles/>Create Another</Button></div></div> : <div className="glass-panel mt-8 flex min-h-96 flex-col items-center justify-center rounded-lg p-8 text-center"><PawPrint className="size-12 text-primary"/><h2 className="mt-4 font-display text-2xl font-bold">YOUR PORTAL IS QUIET</h2><p className="mt-2 max-w-sm text-sm text-muted-foreground">Create your first Spritemal and they’ll live here.</p><Button className="mt-6" variant="portal" size="xl" onClick={beginCreate}>Create My Spritemal</Button></div>}</div>; }
+function CollectionView({ saved, name, profile, beginCreate, go }: { saved: boolean; name: string; profile: SavedSpritemal | null; beginCreate: () => void; go: (v: View) => void }) { return <div className="mx-auto min-h-[calc(100vh-4rem)] max-w-6xl px-4 py-10 sm:px-6"><p className="text-xs font-bold uppercase text-primary">Your collection</p><h1 className="mt-2 font-display text-4xl font-bold">MY SPRITEMALS</h1>{saved ? <div className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]"><div className="glass-panel overflow-hidden rounded-lg"><CreatureStage name={name}/><div className="grid grid-cols-3 border-t border-border p-4 text-center"><div><strong>01</strong><p className="text-[10px] uppercase text-muted-foreground">Level</p></div><div><strong>{profile?.traits[0] ?? "New"}</strong><p className="text-[10px] uppercase text-muted-foreground">Nature</p></div><div><strong>{profile?.custom.aura ?? "Starlight"}</strong><p className="text-[10px] uppercase text-muted-foreground">Theme</p></div></div></div><div className="space-y-3">{profile && <div className="glass-panel rounded-lg p-4"><p className="text-xs font-bold uppercase text-primary">Companion Form</p><div className="mt-2 flex flex-wrap gap-1.5">{profile.traits.map((trait) => <span key={trait} className="rounded-full border border-border px-2 py-1 text-[10px] font-bold">{trait}</span>)}</div><p className="mt-3 text-sm italic text-muted-foreground">“{profile.greeting}”</p></div>}<Button variant="portal" size="xl" className="w-full" onClick={() => go("companion")}><Heart/>Visit {name}</Button><Button variant="glass" size="xl" className="w-full" onClick={() => go("shop")}><ShoppingBag/>Shop Their Collection</Button><Button variant="glass" size="xl" className="w-full" onClick={beginCreate}><Sparkles/>Edit {name}</Button></div></div> : <div className="glass-panel mt-8 flex min-h-96 flex-col items-center justify-center rounded-lg p-8 text-center"><PawPrint className="size-12 text-primary"/><h2 className="mt-4 font-display text-2xl font-bold">YOUR PORTAL IS QUIET</h2><p className="mt-2 max-w-sm text-sm text-muted-foreground">Create your first Spritemal and they’ll live here.</p><Button className="mt-6" variant="portal" size="xl" onClick={beginCreate}>Create My Spritemal</Button></div>}</div>; }
 
 function ShopView({ name, notify }: { name: string; notify: (s: string) => void }) { return <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6"><p className="text-xs font-bold uppercase text-gold">The Spritemals Forge</p><h1 className="mt-2 font-display text-4xl font-bold">BRING YOUR SPRITEMAL HOME</h1><p className="mt-3 max-w-2xl text-sm text-muted-foreground">Preview custom keepsakes inspired by your companion. Products and ordering are concept-only in Mock 1.</p><section className="mt-8 grid overflow-hidden rounded-lg border border-gold/40 bg-card shadow-glass lg:grid-cols-2"><div className="relative min-h-96 bg-cosmic"><div className="absolute inset-[18%] rounded-full border border-gold/60 bg-gold/10 blur-sm"/><img src={createdImage} alt={`Custom ${name} plush concept`} width={1024} height={1280} className="relative z-10 h-[440px] w-full object-contain"/></div><div className="flex flex-col justify-center p-6 sm:p-10"><div className="w-fit rounded-full bg-gold/15 px-3 py-1 text-xs font-black uppercase text-gold">Hero collectible</div><h2 className="mt-4 font-display text-3xl font-bold">CUSTOM {name.toUpperCase()} PLUSH</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">A made-for-you physical plush concept based on your saved Spritemal’s colors, markings, eyes, and signature accessory.</p><div className="mt-6 text-3xl font-black text-gold">$—</div><Button variant="portal" size="xl" className="mt-6" onClick={() => notify("Customization preview added")}>Customize Plush<Sparkles/></Button><p className="mt-3 text-center text-[10px] uppercase text-muted-foreground">Prototype only • No checkout or manufacturing is live</p></div></section><h2 className="mt-14 font-display text-2xl font-bold">MATCHING GEAR & KEEPSAKES</h2><div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">{products.map((p, i) => <article key={p.name} className="glass-panel rounded-lg p-4"><div className={`grid aspect-square place-items-center rounded-md ${i % 3 === 0 ? "bg-primary/10 text-primary" : i % 3 === 1 ? "bg-violet/10 text-violet" : "bg-gold/10 text-gold"}`}><span className="text-5xl">{p.icon}</span></div><div className="mt-4 flex items-start justify-between gap-2"><h3 className="text-sm font-bold">{p.name}</h3><strong className="text-primary">$—</strong></div><Button variant="glass" size="sm" className="mt-4 w-full" onClick={() => notify(`${p.name} added to concept tray`)}>Customize</Button></article>)}</div></div>; }
 
