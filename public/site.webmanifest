@@ -1,0 +1,16 @@
+{
+  "name": "SPRITEMALS — Create Your AI Pet Companion",
+  "short_name": "SPRITEMALS",
+  "description": "Turn your real pet into a magical virtual companion and custom collectible concept.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050816",
+  "theme_color": "#050816",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
