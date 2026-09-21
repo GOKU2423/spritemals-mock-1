@@ -57,7 +57,8 @@ function SpritemalsApp() {
   const [mood, setMood] = useState("Curious");
   const [custom, setCustom] = useState({ collar: "Cyan", markings: "Starlight", eyes: "Glacier", accessory: "Cosmic scarf" });
   const createRef = useRef<HTMLDivElement>(null);
-  const currentGuide = guides.find((item) => item.name === guide) ?? guides[1];
+  const currentGuide = guides.find((item) => item.name === guide);
+  if (!currentGuide) return null;
 
   useEffect(() => { if (!toast) return; const timer = window.setTimeout(() => setToast(""), 2200); return () => window.clearTimeout(timer); }, [toast]);
 
@@ -71,7 +72,7 @@ function SpritemalsApp() {
         <div className="mx-auto grid h-16 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 sm:px-6">
           <button aria-label="Go home" onClick={() => go("home")} className="w-fit cursor-pointer"><Brand /></button>
           <nav className="hidden items-center gap-1 md:flex">
-            {(["home", "create", "collection", "shop", "companion"] as View[]).map((item) => <Button key={item} variant="ghost" onClick={() => go(item)} className={view === item ? "bg-accent text-primary" : "text-muted-foreground"}>{item === "collection" ? "My Spritemals" : item[0].toUpperCase() + item.slice(1)}</Button>)}
+            {(["home", "create", "collection", "shop", "companion"] as View[]).map((item) => <Button key={item} variant="ghost" onClick={() => go(item)} className={view === item ? "bg-accent text-primary" : "text-muted-foreground"}>{item === "collection" ? "My Spritemals" : item.charAt(0).toUpperCase() + item.slice(1)}</Button>)}
           </nav>
           <button aria-label="Profile" className="grid size-9 place-items-center rounded-full border border-border bg-card md:hidden"><CircleUserRound className="size-5" /></button>
         </div>
@@ -112,9 +113,9 @@ function HomeView({ guide, setGuide, beginCreate, currentGuide }: { guide: Guide
   </>;
 }
 
-function CreateView({ step, setStep, uploaded, setUploaded, generated, generating, generate, name, setName, custom, setCustom, save, go }: any) {
+function CreateView({ ref: createRef, step, setStep, uploaded, setUploaded, generated, generating, generate, name, setName, custom, setCustom, save, go }: any) {
   const options: Record<string, string[]> = { collar: ["Cyan", "Violet", "Solar"], markings: ["Starlight", "Moonstripe", "Ember"], eyes: ["Glacier", "Aurora", "Gold"], accessory: ["Cosmic scarf", "Explorer pack", "Royal charm"] };
-  return <div ref={arguments[0].ref} className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+  return <div ref={createRef} className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
     <div className="mb-8"><p className="text-xs font-bold uppercase text-primary">Creation Portal</p><h1 className="mt-2 font-display text-3xl font-bold sm:text-5xl">CREATE YOUR SPRITEMAL</h1><p className="mt-2 text-sm text-muted-foreground">A guided prototype — no real AI generation or order is submitted.</p></div>
     <div className="mb-8 flex items-center gap-2 overflow-x-auto pb-2">{steps.map((label, i) => <button key={label} onClick={() => (i <= step || generated) && setStep(i)} className={`flex min-w-fit items-center gap-2 rounded-full border px-3 py-2 text-xs font-bold ${step === i ? "border-primary bg-primary text-primary-foreground" : i < step ? "border-primary/40 bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground"}`}><span>{i < step ? <Check className="size-3"/> : i+1}</span>{label}</button>)}</div>
     <Progress value={(step + 1) * 20} className="mb-8" />
