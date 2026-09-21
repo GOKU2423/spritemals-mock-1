@@ -202,7 +202,7 @@ export function CreateStudio({ onSave, go, initial }: { onSave: (profile: SavedS
 function CreaturePreview({ name, custom, before = false }: { name: string; custom: Customization; before?: boolean }) {
   const shown = before ? defaults : custom;
   return <div className="relative min-h-[430px] overflow-hidden rounded-lg border border-primary/30 bg-cosmic">
-    <div className={`absolute inset-[14%] rounded-full border border-primary/50 bg-primary/10 blur-2xl transition ${auraClass[shown.aura] ?? auraClass.Nebula}`}/><div className="animate-portal absolute bottom-[9%] left-[12%] right-[12%] h-12 rounded-[50%] border-2 border-primary bg-primary/20 shadow-portal-lg"/>
+    <div className={`absolute inset-[14%] rounded-full border border-primary/50 bg-primary/10 blur-2xl transition ${auraClass[shown.aura] ?? auraClass["Nebula"]}`}/><div className="animate-portal absolute bottom-[9%] left-[12%] right-[12%] h-12 rounded-[50%] border-2 border-primary bg-primary/20 shadow-portal-lg"/>
     <img src={createdImage} alt={`${name || "Unnamed"} custom Spritemal Companion Form`} className={`animate-floaty relative z-10 h-[430px] w-full object-contain transition duration-500 ${appearanceClass[shown.appearance] ?? ""}`}/>
     <div className="absolute left-1/2 top-[18%] z-20 -translate-x-1/2 rounded-full border border-primary/40 bg-background/75 px-3 py-1 text-[10px] font-black uppercase text-primary backdrop-blur">{shown.markings}</div>
     <div className="absolute right-4 top-4 z-20 rounded-md border border-border bg-background/80 px-2 py-1 text-[10px] font-bold text-energy"><Eye className="mr-1 inline size-3"/>{shown.eyes} eyes</div>
