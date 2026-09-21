@@ -186,6 +186,7 @@ export function CreateStudio({
   const [celebrating, setCelebrating] = useState(Boolean(initial));
   const [generatedImage, setGeneratedImage] = useState("");
   const [generationError, setGenerationError] = useState("");
+  const [demoCode, setDemoCode] = useState("");
   const chooseInput = useRef<HTMLInputElement>(null);
   const cameraInput = useRef<HTMLInputElement>(null);
   const { photo, file, choose } = usePhotoPreview();
@@ -260,7 +261,11 @@ export function CreateStudio({
     try {
       const body = new FormData();
       body.set("image", file);
-      const response = await fetch("/api/generate-spritemal", { method: "POST", body });
+      const response = await fetch("/api/generate-spritemal", {
+        method: "POST",
+        headers: { "x-spritemals-demo-code": demoCode },
+        body,
+      });
       const payload = (await response.json()) as { image?: string; error?: string };
       if (!response.ok || !payload.image) throw new Error(payload.error || "Generation failed.");
       setCreationProgress(100);
@@ -437,6 +442,28 @@ export function CreateStudio({
               <Progress value={creationProgress} />
             </div>
           )}
+          {!revealed && (
+            <div className="mx-auto mt-5 max-w-xl text-left">
+              <label
+                className="text-xs font-bold uppercase text-muted-foreground"
+                htmlFor="demo-code"
+              >
+                Private demo code
+              </label>
+              <input
+                id="demo-code"
+                type="password"
+                value={demoCode}
+                onChange={(event) => setDemoCode(event.target.value)}
+                autoComplete="off"
+                placeholder="Enter your invitation code"
+                className="mt-2 h-12 w-full rounded-lg border border-input bg-background/60 px-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+              <p className="mt-1 text-[10px] text-muted-foreground">
+                This protects the owner from unauthorized AI charges during testing.
+              </p>
+            </div>
+          )}
           {generationError && (
             <div
               role="alert"
@@ -461,7 +488,7 @@ export function CreateStudio({
               variant="portal"
               size="xl"
               className="mt-6 w-full max-w-xl"
-              disabled={generating || !file}
+              disabled={generating || !file || !demoCode.trim()}
               onClick={generateSpritemal}
             >
               <WandSparkles />
