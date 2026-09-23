@@ -29,7 +29,6 @@ export const Route = createFileRoute("/")({
         content:
           "Create a personalized virtual pet companion, customize its look, and explore a custom plush inspired by the pet you love.",
       },
-      { property: "og:url", content: "https://spritemals-mock-1.lovable.app/" },
       { property: "og:site_name", content: "SPRITEMALS" },
       { property: "og:locale", content: "en_US" },
       { property: "og:type", content: "website" },
@@ -41,7 +40,6 @@ export const Route = createFileRoute("/")({
           "Turn your real pet into a magical virtual companion and custom collectible concept.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://spritemals-mock-1.lovable.app/" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -49,7 +47,6 @@ export const Route = createFileRoute("/")({
           "@context": "https://schema.org",
           "@type": "WebApplication",
           name: "SPRITEMALS",
-          url: "https://spritemals-mock-1.lovable.app/",
           description:
             "A mobile-first creative prototype that turns a real pet into a personalized virtual companion and custom collectible concept.",
           applicationCategory: "EntertainmentApplication",
